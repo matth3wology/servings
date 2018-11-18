@@ -1,5 +1,7 @@
 # SERVINGS
-TF Servings Template
+_TF SERVINGS TEMPLATE_
+
+To launch a TF Serving server from CLI: `tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=${model_name} --model_base_path=/models/${model_name}`
 
 
 ### Docker Container + TF Servings
@@ -12,6 +14,22 @@ docker run -p 8501:8501 \
 ```
 
 The best method would be to automate this with a *Dockerfile*.
+```
+FROM tensorflow/serving:nightly
+
+ENV model_name=custom_api
+
+COPY ./${model_name} /models/${model_name}
+
+RUN apt update \
+  && apt upgrade \
+  && tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=${model_name} --model_base_path=/models/${model_name}
+
+EXPOSE 8501
+EXPOSE 8500
+```
+
+
 ### Making Rest API Calls example
 
 A client needs to make a *POST* request to the server with the following properties: `curl -d '{"instances": [0.0]}' -X POST 127.0.0.1:8501/v1/models/custom_api:predict`
